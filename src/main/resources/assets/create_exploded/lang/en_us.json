@@ -1,0 +1,13 @@
+{
+  "itemGroup.create_exploded": "Example Mod Tab",
+  "block.create_exploded.example_block": "Example Block",
+  "item.create_exploded.example_item": "Example Item",
+
+  "create_exploded.configuration.title": "Create: Exploded Configs",
+  "create_exploded.configuration.section.create_exploded.common.toml": "Create: Exploded Configs",
+  "create_exploded.configuration.section.create_exploded.common.toml.title": "Create: Exploded Configs",
+  "create_exploded.configuration.items": "Item List",
+  "create_exploded.configuration.logDirtBlock": "Log Dirt Block",
+  "create_exploded.configuration.magicNumberIntroduction": "Magic Number Text",
+  "create_exploded.configuration.magicNumber": "Magic Number"
+}
