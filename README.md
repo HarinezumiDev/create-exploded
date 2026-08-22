@@ -23,6 +23,7 @@ No more parking a warehouse of gasoline next to your TNT cannon and walking away
 |---|---|---|
 | **[Create](https://modrinth.com/mod/create)** | Fluid Tank | Required |
 | **[Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)** | Fluid Tank / Fluid Vessel (Crude Oil, Biodiesel, Diesel, Gasoline, Plant Oil, Ethanol) | Required |
+| **[Kotlin for Forge](https://modrinth.com/mod/kotlin-for-forge)** | — | Required |
 | **[Create: Connected](https://modrinth.com/mod/create-connected)** | Fluid Vessel | Built-in support |
 | **[Create Propulsion: Simulated](https://modrinth.com/mod/create-propulsion-simulated)** | Thruster, Liquid Vector Thruster | Built-in support |
 
@@ -46,7 +47,7 @@ Beyond the mods listed above, Create: Exploded also auto-detects fluid container
 ## Requirements
 
 - **Loader:** NeoForge
-- **Required:** Create, Create: Diesel Generators
+- **Required:** Create, Create: Diesel Generators, Kotlin for Forge
 
 ---
 
