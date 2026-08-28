@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.capabilities.Capabilities
@@ -27,6 +28,9 @@ object TankExplosionHandler {
     fun onDetonate(event: ExplosionEvent.Detonate) {
         val level = event.level as? ServerLevel ?: return
         if (level.isClientSide) return
+        val explosion = event.explosion
+        val direct = explosion.getDirectSourceEntity()
+        if (direct is AbstractWindCharge) return
         val affected = event.affectedBlocks
         if (affected.isEmpty()) return
         val snapshot = affected.toList()
@@ -105,7 +109,7 @@ object TankExplosionHandler {
         val snapshot = synchronized(list) { list.toList() }
         for ((pos, power) in snapshot) {
             if (!level.isLoaded(pos)) continue
-            level.explode(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, power, true, Level.ExplosionInteraction.BLOCK)
+            level.explode(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, power, true, Level.ExplosionInteraction.TNT)
         }
     }
 
