@@ -12,26 +12,46 @@ No more parking a warehouse of gasoline next to your TNT cannon and walking away
 
 - **Chain reactions, not magic.** Tanks don't spontaneously combust — any explosion (TNT, creepers, other mods, or another exploded tank) that reaches a tank containing a flammable fluid will set it off in turn. Build your fuel depot next to a minefield at your own risk.
 - **Explosion power scales with fluid volume.** A near-empty tank gives a modest pop. A fully stacked multiblock tank brimming with crude oil is a crater. The mod reads the *actual* fluid amount stored (not the tank's total capacity), so partially filled tanks are proportionally safer.
-- **Not all fluids are equally dangerous.** Each supported liquid has its own explosiveness rating based on real-world combustion energy and flammability — crude oil and diesel hit harder than plant oil or ethanol, for example.
+- **Not all fluids are equally dangerous.** Each supported liquid has its own explosiveness rating based on real-world combustion energy and flammability — see the ratings table below.
 - **Multiblock aware.** Create's tanks merge into a single shared reservoir when connected — Create: Exploded treats the whole connected structure as one volume when calculating blast force, so building a bigger tank farm means building a bigger bomb.
 
 ---
 
 ## Supported Fluids & Compatibility
 
+| Fluid | Rating |
+|---|---|
+| Hydrogen | 1.25 |
+| Napalm | 1.2 |
+| Diesel | 1.15 |
+| Crude Oil | 1.1 |
+| LPG / Propane / Butane | 1.1 |
+| Naphtha | 1.05 |
+| Gasoline | 1.0 |
+| Kerosene | 1.0 |
+| Heavy Oil | 1.0 |
+| Other fuel (`c:fuel`, `tfmg:flammable`, `tfmg:fuel`) | 1.0 |
+| Biodiesel | 0.9 |
+| Ethanol | 0.75 |
+| Creosote | 0.7 |
+| Plant Oil | 0.6 |
+| Lubrication Oil | 0.6 |
+| Furnace Gas | 0.5 |
+
 | Source | Container(s) | Status |
 |---|---|---|
 | **[Create](https://modrinth.com/mod/create)** | Fluid Tank | Required |
-| **[Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)** | Fluid Tank / Fluid Vessel (Crude Oil, Biodiesel, Diesel, Gasoline, Plant Oil, Ethanol) | Required |
 | **[Kotlin for Forge](https://modrinth.com/mod/kotlin-for-forge)** | — | Required |
-| **[Create: Connected](https://modrinth.com/mod/create-connected)** | Fluid Vessel | Built-in support |
-| **[Create Propulsion: Simulated](https://modrinth.com/mod/create-propulsion-simulated)** | Thruster, Liquid Vector Thruster | Built-in support |
+| **[Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)** | Fluid Tank / Fluid Vessel | Tested |
+| **[Create: The Factory Must Grow](https://modrinth.com/mod/create-tfmg)** | Fluid Tank | Tested |
+| **[Create: Connected](https://modrinth.com/mod/create-connected)** | Fluid Vessel | Tested |
+| **[Create Propulsion: Simulated](https://modrinth.com/mod/create-propulsion-simulated)** | Thruster, Liquid Vector Thruster | Tested |
 
-**Required** — the mod won't load without these; Create provides the tanks, and Create: Diesel Generators provides the explosive fluids themselves.
+**Required** — the mod won't load without these.
 
-**Built-in support** — this mod's fluid containers are explicitly handled in code with their own explosion logic, not just picked up by generic detection.
+**Tested** — verified to work and covered by testing, but the mod loads fine without them.
 
-Beyond the mods listed above, Create: Exploded also auto-detects fluid containers from other mods it wasn't specifically built for, so it will generally work alongside other Create addons that store fluids. This detection is generic (based on capability and block-name matching) rather than mod-specific, so behavior for unlisted mods isn't guaranteed to be fully consistent — treat it as best-effort compatibility rather than a supported feature.
+Fluids are matched by fluid tags first (`c:*`, `tfmg:flammable`, `tfmg:fuel`), with a registry-name fallback for untagged or custom fluids. Tanks are picked up generically through the fluid capability and block-name matching (`tank`, `vessel`, `cistern`), while diesel engines and thrusters are handled explicitly with their own multiblock-aware explosion logic. Beyond the mods listed above, Create: Exploded will generally work alongside other Create addons that store fluids — treat unlisted mods as best-effort compatibility rather than a supported feature.
 
 ---
 
@@ -47,7 +67,8 @@ Beyond the mods listed above, Create: Exploded also auto-detects fluid container
 ## Requirements
 
 - **Loader:** NeoForge
-- **Required:** Create, Create: Diesel Generators, Kotlin for Forge
+- **Required:** Create, Kotlin for Forge
+- **Optional:** Create: Diesel Generators, Create: The Factory Must Grow, Create: Connected, Create Propulsion: Simulated
 
 ---
 

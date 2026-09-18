@@ -32,7 +32,7 @@ object PropulsionCompat {
             if (fluidStackMethod != null && amountMethod != null) {
                 val stack = fluidStackMethod.invoke(be) as? FluidStack ?: return null
                 if (stack.isEmpty) return null
-                val ef = com.harinezumi_dev.cexploded.explosion.ExplosiveFluids.factor(stack.fluid) ?: return null
+                val ef = com.harinezumi_dev.cexploded.explosion.ExplosiveFluids.factor(stack) ?: return null
                 val amount = amountMethod.invoke(be) as? Int ?: stack.amount
                 if (amount <= 0) return null
                 amount to ef
@@ -44,7 +44,7 @@ object PropulsionCompat {
                 for (i in 0 until handler.tanks) {
                     val s = handler.getFluidInTank(i)
                     if (s.isEmpty) continue
-                    val f = com.harinezumi_dev.cexploded.explosion.ExplosiveFluids.factor(s.fluid) ?: continue
+                    val f = com.harinezumi_dev.cexploded.explosion.ExplosiveFluids.factor(s) ?: continue
                     total += s.amount
                     if (ef == null) ef = f
                 }

@@ -67,7 +67,7 @@ Create: Exploded offers the opportunity to experience the full explosive power o
 
 [[dependencies.${mod_id}]]
     modId="createdieselgenerators"
-    type="required"
+    type="optional"
     versionRange="[1.3.0,)"
     ordering="AFTER"
     side="BOTH"
@@ -80,6 +80,12 @@ Create: Exploded offers the opportunity to experience the full explosive power o
 
 [[dependencies.${mod_id}]]
     modId="createpropulsion"
+    type="optional"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="tfmg"
     type="optional"
     ordering="AFTER"
     side="BOTH"

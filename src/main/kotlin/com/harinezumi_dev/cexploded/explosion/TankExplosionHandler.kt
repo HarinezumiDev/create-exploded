@@ -70,7 +70,7 @@ object TankExplosionHandler {
             for (i in 0 until handler.tanks) {
                 val stack = handler.getFluidInTank(i)
                 if (stack.isEmpty) continue
-                val f = ExplosiveFluids.factor(stack.fluid) ?: continue
+                val f = ExplosiveFluids.factor(stack) ?: continue
                 total += stack.amount
                 if (ef == null) ef = f
             }
