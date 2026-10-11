@@ -90,5 +90,11 @@ Create: Exploded offers the opportunity to experience the full explosive power o
     ordering="AFTER"
     side="BOTH"
 
+[[dependencies.${mod_id}]]
+    modId="petrochem"
+    type="optional"
+    ordering="AFTER"
+    side="BOTH"
+
 #[features.${mod_id}]
 #openGLVersion="[3.2,)"

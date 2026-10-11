@@ -21,11 +21,10 @@ object ExplosiveFluids {
         fluidTag("c", "plant_oil") to 0.6,
         fluidTag("c", "ethanol") to 0.75,
         fluidTag("c", "naphtha") to 1.05,
+        fluidTag("c", "naphta") to 1.05,
         fluidTag("c", "kerosene") to 1.0,
         fluidTag("c", "heavy_oil") to 1.0,
         fluidTag("c", "lpg") to 1.1,
-        fluidTag("c", "lubrication_oil") to 0.6,
-        fluidTag("c", "creosote") to 0.7,
         fluidTag("c", "furnace_gas") to 0.5
     )
 
@@ -35,31 +34,50 @@ object ExplosiveFluids {
         fluidTag("tfmg", "fuel") to 1.0
     )
 
+    /* something for later :)
+    private val ignitables = mapOf(
+        "oil_residue" to (1.0 to 0.4),
+        "heavy_oil_residue" to (1.2 to 0.3),
+        "oil_brine" to (0.5 to 0.2),
+        "lubricant" to (0.8 to 0.3),
+        "lubrication_oil" to (0.8 to 0.3),
+        "creosote" to (1.0 to 0.6)
+    )
+    */
+
     fun factor(stack: FluidStack): Double? {
         if (stack.isEmpty) return null
         for ((tag, value) in specificTags) {
             if (stack.`is`(tag)) return value
         }
         val path = BuiltInRegistries.FLUID.getKey(stack.fluid).path
+        if (path.contains("hydrogen_sulfide")) return 0.9
         if (path.contains("hydrogen")) return 1.25
         if (path.contains("napalm")) return 1.2
         if (path.contains("propane")) return 1.1
         if (path.contains("butane")) return 1.1
+        if (path.contains("ethylene")) return 1.1
+        if (path.contains("volatile_gas")) return 1.0
+        if (path.contains("residue") || path.contains("brine")) return null
+        if (path.contains("lubricant") || path.contains("lubrication_oil")) return null
+        if (path.contains("creosote")) return null
         for ((tag, value) in genericTags) {
             if (stack.`is`(tag)) return value
         }
         if (path.contains("biodiesel")) return 0.9
         if (path.contains("crude_oil") || path.contains("crudeoil")) return 1.1
+        if (path.contains("desalted_oil")) return 1.1
+        if (path == "oil" || path == "flowing_oil") return 1.1
         if (path.contains("plant_oil") || path.contains("plantoil")) return 0.6
         if (path.contains("gasoline")) return 1.0
         if (path.contains("ethanol")) return 0.75
         if (path.contains("diesel")) return 1.15
-        if (path.contains("naphtha")) return 1.05
+        if (path.contains("gas_oil")) return 1.1
+        if (path.contains("naphtha") || path.contains("naphta")) return 1.05
         if (path.contains("kerosene")) return 1.0
         if (path.contains("heavy_oil") || path.contains("heavyoil")) return 1.0
+        if (path.contains("fuel_oil")) return 1.0
         if (path.contains("lpg")) return 1.1
-        if (path.contains("lubrication_oil")) return 0.6
-        if (path.contains("creosote")) return 0.7
         if (path.contains("furnace_gas") || path.contains("furnacegas")) return 0.5
         return null
     }
