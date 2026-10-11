@@ -27,8 +27,8 @@ object PropulsionCompat {
         val be = level.getBlockEntity(pos) ?: return null
         return try {
             val clazz = be.javaClass
-            val fluidStackMethod = try { clazz.getMethod("fluidStack") } catch (_: NoSuchMethodException) { null }
-            val amountMethod = try { clazz.getMethod("getFuelAmountMb") } catch (_: NoSuchMethodException) { null }
+            val fluidStackMethod = ReflectionCache.method(clazz, "fluidStack")
+            val amountMethod = ReflectionCache.method(clazz, "getFuelAmountMb")
             if (fluidStackMethod != null && amountMethod != null) {
                 val stack = fluidStackMethod.invoke(be) as? FluidStack ?: return null
                 if (stack.isEmpty) return null
@@ -58,24 +58,28 @@ object PropulsionCompat {
 
     fun getOrigin(level: ServerLevel, pos: BlockPos): BlockPos {
         val be = level.getBlockEntity(pos) ?: return pos
-        return try {
-            val f = be.javaClass.getDeclaredField("controllerPos")
-            f.isAccessible = true
-            (f.get(be) as? BlockPos) ?: pos
+        val f = ReflectionCache.field(be.javaClass, "controllerPos")
+        if (f != null) {
+            return try {
+                f.get(be) as? BlockPos ?: pos
+            } catch (_: Exception) { pos }
+        }
+        val m = ReflectionCache.method(be.javaClass, "getControllerBE") ?: return pos
+        val ctrl = try {
+            m.invoke(be)
         } catch (_: Exception) {
-            try {
-                val m = be.javaClass.getMethod("getControllerBE")
-                val ctrl = m.invoke(be) ?: return pos
-                val cf = ctrl.javaClass.getDeclaredField("controllerPos")
-                cf.isAccessible = true
-                (cf.get(ctrl) as? BlockPos) ?: run {
-                    val pf = ctrl.javaClass.getDeclaredField("blockPos")
-                    pf.isAccessible = true
-                    pf.get(ctrl) as? BlockPos ?: pos
-                }
-            } catch (_: Exception) {
-                pos
-            }
+            return pos
+        } ?: return pos
+        val cf = ReflectionCache.field(ctrl.javaClass, "controllerPos") ?: return pos
+        val c = try {
+            cf.get(ctrl) as? BlockPos
+        } catch (_: Exception) { return pos }
+        if (c != null) return c
+        val pf = ReflectionCache.field(ctrl.javaClass, "blockPos") ?: return pos
+        return try {
+            pf.get(ctrl) as? BlockPos ?: pos
+        } catch (_: Exception) {
+            pos
         }
     }
 
@@ -89,33 +93,40 @@ object PropulsionCompat {
         var width = 1
         var origin: BlockPos? = null
         if (be != null) {
-            try {
-                val wField = be.javaClass.getDeclaredField("width")
-                wField.isAccessible = true
-                width = wField.getInt(be).coerceIn(1, 3)
-            } catch (_: Exception) {}
-            try {
-                val ctrlField = be.javaClass.getDeclaredField("controllerPos")
-                ctrlField.isAccessible = true
-                origin = ctrlField.get(be) as? BlockPos
-            } catch (_: Exception) {}
-            try {
-                val ctrlMethod = be.javaClass.getMethod("getControllerBE")
-                val ctrl = ctrlMethod.invoke(be)
-                if (ctrl != null) {
-                    val w2 = ctrl.javaClass.getDeclaredField("width")
-                    w2.isAccessible = true
-                    width = w2.getInt(ctrl).coerceIn(1, 3)
-                    val c2 = ctrl.javaClass.getDeclaredField("controllerPos")
-                    c2.isAccessible = true
-                    origin = c2.get(ctrl) as? BlockPos
-                    if (origin == null) {
-                        val posField = ctrl.javaClass.getDeclaredField("blockPos")
-                        posField.isAccessible = true
-                        origin = posField.get(ctrl) as? BlockPos
+            val wField = ReflectionCache.field(be.javaClass, "width")
+            if (wField != null) {
+                try {
+                    width = wField.getInt(be).coerceIn(1, 3)
+                } catch (_: Exception) {}
+            }
+            val ctrlField = ReflectionCache.field(be.javaClass, "controllerPos")
+            if (ctrlField != null) {
+                try {
+                    origin = ctrlField.get(be) as? BlockPos
+                } catch (_: Exception) {}
+            }
+            val ctrlMethod = ReflectionCache.method(be.javaClass, "getControllerBE")
+            if (ctrlMethod != null) {
+                try {
+                    val ctrl = ctrlMethod.invoke(be)
+                    if (ctrl != null) {
+                        val w2 = ReflectionCache.field(ctrl.javaClass, "width")
+                        if (w2 != null) {
+                            width = w2.getInt(ctrl).coerceIn(1, 3)
+                        }
+                        val c2 = ReflectionCache.field(ctrl.javaClass, "controllerPos")
+                        if (c2 != null) {
+                            origin = c2.get(ctrl) as? BlockPos
+                        }
+                        if (origin == null) {
+                            val posField = ReflectionCache.field(ctrl.javaClass, "blockPos")
+                            if (posField != null) {
+                                origin = posField.get(ctrl) as? BlockPos
+                            }
+                        }
                     }
-                }
-            } catch (_: Exception) {}
+                } catch (_: Exception) {}
+            }
         }
         if (origin == null) origin = start
         if (width <= 1) {

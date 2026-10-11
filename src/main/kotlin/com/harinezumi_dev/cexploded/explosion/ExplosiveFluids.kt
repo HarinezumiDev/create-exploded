@@ -1,5 +1,6 @@
 package com.harinezumi_dev.cexploded.explosion
 
+import java.util.IdentityHashMap
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
@@ -45,8 +46,27 @@ object ExplosiveFluids {
     )
     */
 
+    private val scopeCache = ThreadLocal.withInitial { IdentityHashMap<Fluid, Double?>() }
+
+    fun beginScope() {
+        scopeCache.get().clear()
+    }
+
+    fun endScope() {
+        scopeCache.get().clear()
+    }
+
     fun factor(stack: FluidStack): Double? {
         if (stack.isEmpty) return null
+        val map = scopeCache.get()
+        val fluid = stack.fluid
+        if (map.containsKey(fluid)) return map[fluid]
+        val value = compute(stack)
+        map[fluid] = value
+        return value
+    }
+
+    private fun compute(stack: FluidStack): Double? {
         for ((tag, value) in specificTags) {
             if (stack.`is`(tag)) return value
         }

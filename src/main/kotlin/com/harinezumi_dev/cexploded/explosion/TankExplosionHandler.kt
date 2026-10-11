@@ -9,6 +9,7 @@ import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge
 import net.neoforged.bus.api.SubscribeEvent
@@ -22,7 +23,14 @@ import com.harinezumi_dev.cexploded.compat.PropulsionCompat
 
 @EventBusSubscriber(modid = "create_exploded", bus = EventBusSubscriber.Bus.GAME)
 object TankExplosionHandler {
+    private const val MAX_EXPLOSIONS_PER_TICK = 8
+
     private val pending = Collections.synchronizedMap(WeakHashMap<ServerLevel, MutableList<Pair<BlockPos, Float>>>())
+    private val tankBlocks: Set<Block> by lazy { collectTankBlocks() }
+
+    fun warmUp() {
+        tankBlocks
+    }
 
     @SubscribeEvent
     fun onDetonate(event: ExplosionEvent.Detonate) {
@@ -33,7 +41,7 @@ object TankExplosionHandler {
         if (direct is AbstractWindCharge) return
         val affected = event.affectedBlocks
         if (affected.isEmpty()) return
-        val snapshot = affected.toList()
+        ExplosiveFluids.beginScope()
         val visited = Collections.newSetFromMap(IdentityHashMap<IFluidHandler, Boolean>())
         val visitedPropulsion = HashSet<BlockPos>()
         val visitedDiesel = HashSet<BlockPos>()
@@ -41,7 +49,7 @@ object TankExplosionHandler {
         val targetHandlers = ArrayList<IFluidHandler>(4)
         val propulsionTargets = ArrayList<Pair<BlockPos, Float>>(4)
         val dieselTargets = ArrayList<Pair<BlockPos, Float>>(4)
-        for (pos in snapshot) {
+        for (pos in affected) {
             val state = level.getBlockState(pos)
             if (PropulsionCompat.isThruster(state)) {
                 val origin = PropulsionCompat.getOrigin(level, pos)
@@ -80,7 +88,10 @@ object TankExplosionHandler {
             targets.add(pos to power)
             targetHandlers.add(handler)
         }
-        if (targets.isEmpty() && propulsionTargets.isEmpty() && dieselTargets.isEmpty()) return
+        if (targets.isEmpty() && propulsionTargets.isEmpty() && dieselTargets.isEmpty()) {
+            ExplosiveFluids.endScope()
+            return
+        }
         for ((pos, power) in propulsionTargets) {
             PropulsionCompat.removeThruster(level, pos)
             val list = pending.computeIfAbsent(level) { Collections.synchronizedList(mutableListOf()) }
@@ -99,6 +110,7 @@ object TankExplosionHandler {
             val list = pending.computeIfAbsent(level) { Collections.synchronizedList(mutableListOf()) }
             list.add(pos to power)
         }
+        ExplosiveFluids.endScope()
     }
 
     @SubscribeEvent
@@ -107,15 +119,27 @@ object TankExplosionHandler {
         val list = pending.remove(level) ?: return
         if (list.isEmpty()) return
         val snapshot = synchronized(list) { list.toList() }
-        for ((pos, power) in snapshot) {
+        val batch = snapshot.take(MAX_EXPLOSIONS_PER_TICK)
+        if (batch.size < snapshot.size) {
+            val leftover = pending.computeIfAbsent(level) { Collections.synchronizedList(mutableListOf()) }
+            synchronized(leftover) { leftover.addAll(snapshot.drop(MAX_EXPLOSIONS_PER_TICK)) }
+        }
+        for ((pos, power) in batch) {
             if (!level.isLoaded(pos)) continue
             level.explode(null, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, power, true, Level.ExplosionInteraction.TNT)
         }
     }
 
-    private fun isTank(state: net.minecraft.world.level.block.state.BlockState): Boolean {
-        val id = BuiltInRegistries.BLOCK.getKey(state.block).path
-        return id.contains("tank") || id.contains("vessel") || id.contains("cistern")
+    private fun isTank(state: net.minecraft.world.level.block.state.BlockState): Boolean =
+        state.block in tankBlocks
+
+    private fun collectTankBlocks(): Set<Block> {
+        val result = HashSet<Block>()
+        for (block in BuiltInRegistries.BLOCK) {
+            val path = BuiltInRegistries.BLOCK.getKey(block).path
+            if (path.contains("tank") || path.contains("vessel") || path.contains("cistern")) result.add(block)
+        }
+        return result
     }
 
     private fun removeTank(level: ServerLevel, start: BlockPos, handler: IFluidHandler) {

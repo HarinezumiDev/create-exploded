@@ -1,6 +1,7 @@
 package com.harinezumi_dev.cexploded
 
 import com.mojang.logging.LogUtils
+import com.harinezumi_dev.cexploded.explosion.TankExplosionHandler
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.Blocks
 import net.neoforged.bus.api.SubscribeEvent
@@ -29,6 +30,7 @@ object CreateExploded {
     }
 
     private fun commonSetup(event: FMLCommonSetupEvent) {
+        TankExplosionHandler.warmUp()
         LOGGER.info("HELLO FROM COMMON SETUP")
         if (Config.LOG_DIRT_BLOCK.get()) {
             LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT))

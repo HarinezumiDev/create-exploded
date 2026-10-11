@@ -26,7 +26,7 @@ object DieselCompat {
         val handler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null as Direction?) ?: run {
             val be = level.getBlockEntity(pos) ?: return null
             return try {
-                val m = be.javaClass.getMethod("getTank")
+                val m = ReflectionCache.method(be.javaClass, "getTank") ?: return null
                 val tank = m.invoke(be) as? net.neoforged.neoforge.fluids.capability.templates.FluidTank ?: return null
                 val stack = tank.fluid
                 if (stack.isEmpty) return null
@@ -53,22 +53,21 @@ object DieselCompat {
     fun getOrigin(level: ServerLevel, pos: BlockPos): BlockPos {
         val be = level.getBlockEntity(pos) ?: return pos
         return try {
-            val f = be.javaClass.getDeclaredField("controller")
-            f.isAccessible = true
-            val c = f.get(be) as? BlockPos
-            if (c != null) return c
-            val f2 = be.javaClass.getDeclaredField("controllerPos")
-            f2.isAccessible = true
-            (f2.get(be) as? BlockPos) ?: pos
-        } catch (_: Exception) {
-            try {
-                val m = be.javaClass.getMethod("getControllerBE")
-                val ctrl = m.invoke(be) ?: return pos
-                val cf = ctrl.javaClass.getDeclaredField("controller")
-                cf.isAccessible = true
-                (cf.get(ctrl) as? BlockPos) ?: pos
-            } catch (_: Exception) { pos }
-        }
+            val controller = ReflectionCache.field(be.javaClass, "controller")
+            if (controller != null) {
+                val c = controller.get(be) as? BlockPos
+                if (c != null) return c
+            }
+            val controllerPos = ReflectionCache.field(be.javaClass, "controllerPos")
+            if (controllerPos != null) {
+                val c = controllerPos.get(be) as? BlockPos
+                if (c != null) return c
+            }
+            val m = ReflectionCache.method(be.javaClass, "getControllerBE") ?: return pos
+            val ctrl = m.invoke(be) ?: return pos
+            val inner = ReflectionCache.field(ctrl.javaClass, "controller") ?: return pos
+            inner.get(ctrl) as? BlockPos ?: pos
+        } catch (_: Exception) { pos }
     }
 
     fun removeEngine(level: ServerLevel, start: BlockPos) {
