@@ -42,15 +42,15 @@ No more parking a warehouse of gasoline next to your TNT cannon and walking away
 | Plant Oil | 0.6 |
 | Furnace Gas | 0.5 |
 
-| Source | Container(s) | Status |
+| Source | Provides | Status |
 |---|---|---|
-| **[Create](https://modrinth.com/mod/create)** | Fluid Tank | Required |
+| **[Create](https://modrinth.com/mod/create)** | Tanks | Required |
 | **[Kotlin for Forge](https://modrinth.com/mod/kotlin-for-forge)** | — | Required |
-| **[Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)** | Fluid Tank / Fluid Vessel | Tested |
-| **[Create: The Factory Must Grow](https://modrinth.com/mod/create-tfmg)** | Fluid Tank | Tested |
-| **[Create: Petrochem](https://www.curseforge.com/minecraft/mc-mods/create-petrochem)** | Fluid Tank | Tested |
-| **[Create: Connected](https://modrinth.com/mod/create-connected)** | Fluid Vessel | Tested |
-| **[Create Propulsion: Simulated](https://modrinth.com/mod/create-propulsion-simulated)** | Thruster, Liquid Vector Thruster | Tested |
+| **[Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)** | Fuels & Engines | Tested |
+| **[Create: The Factory Must Grow](https://modrinth.com/mod/create-tfmg)** | Fuels | Tested |
+| **[Create: Petrochem](https://www.curseforge.com/minecraft/mc-mods/create-petrochem)** | Fuels | Tested |
+| **[Create: Connected](https://modrinth.com/mod/create-connected)** | Vessels | Tested |
+| **[Create Propulsion: Simulated](https://modrinth.com/mod/create-propulsion-simulated)** | Thrusters | Tested |
 
 **Required** — the mod won't load without these.
 
