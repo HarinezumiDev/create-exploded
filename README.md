@@ -77,6 +77,12 @@ Fluids are matched by fluid tags first (`c:*`, `tfmg:flammable`, `tfmg:fuel`), w
 
 ---
 
+## For Mod Developers
+
+Custom damage that bypasses vanilla explosions? See [API.md](API.md) — one method call sets fuel tanks off.
+
+---
+
 ## Feedback & Issues
 
 Found a fluid that should (or shouldn't) go boom? Balance feels off? Leave your feedback on my Discord server — this mod is actively tuned based on player feedback.

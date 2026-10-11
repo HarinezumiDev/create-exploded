@@ -72,17 +72,7 @@ object TankExplosionHandler {
             if (!isTank(state)) continue
             val handler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null as Direction?) ?: continue
             if (!visited.add(handler)) continue
-            if (handler.tanks == 0) continue
-            var total = 0
-            var ef: Double? = null
-            for (i in 0 until handler.tanks) {
-                val stack = handler.getFluidInTank(i)
-                if (stack.isEmpty) continue
-                val f = ExplosiveFluids.factor(stack) ?: continue
-                total += stack.amount
-                if (ef == null) ef = f
-            }
-            if (total <= 0 || ef == null) continue
+            val (total, ef) = inspectTank(handler) ?: continue
             val power = ExplosionMath.compute(total, ef)
             if (power < 0.5f) continue
             targets.add(pos to power)
@@ -132,6 +122,68 @@ object TankExplosionHandler {
 
     private fun isTank(state: net.minecraft.world.level.block.state.BlockState): Boolean =
         state.block in tankBlocks
+
+    fun triggerTank(level: ServerLevel, pos: BlockPos): Boolean {
+        ExplosiveFluids.beginScope()
+        try {
+            return triggerTankInScope(level, pos)
+        } finally {
+            ExplosiveFluids.endScope()
+        }
+    }
+
+    fun triggerTanksInRadius(level: ServerLevel, center: BlockPos, radius: Double): Int {
+        val r = radius.coerceIn(0.0, 64.0)
+        if (r <= 0.0) return 0
+        val range = kotlin.math.ceil(r).toInt()
+        val limit = r * r
+        var count = 0
+        ExplosiveFluids.beginScope()
+        try {
+            for (dx in -range..range) {
+                for (dy in -range..range) {
+                    for (dz in -range..range) {
+                        val cx = dx + 0.5
+                        val cy = dy + 0.5
+                        val cz = dz + 0.5
+                        if (cx * cx + cy * cy + cz * cz > limit) continue
+                        if (triggerTankInScope(level, center.offset(dx, dy, dz))) count++
+                    }
+                }
+            }
+            return count
+        } finally {
+            ExplosiveFluids.endScope()
+        }
+    }
+
+    private fun triggerTankInScope(level: ServerLevel, pos: BlockPos): Boolean {
+        val state = level.getBlockState(pos)
+        if (!isTank(state)) return false
+        val handler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null as Direction?) ?: return false
+        val (total, ef) = inspectTank(handler) ?: return false
+        val power = ExplosionMath.compute(total, ef)
+        if (power < 0.5f) return false
+        removeTank(level, pos, handler)
+        val list = pending.computeIfAbsent(level) { Collections.synchronizedList(mutableListOf()) }
+        list.add(pos to power)
+        return true
+    }
+
+    private fun inspectTank(handler: IFluidHandler): Pair<Int, Double>? {
+        if (handler.tanks == 0) return null
+        var total = 0
+        var ef: Double? = null
+        for (i in 0 until handler.tanks) {
+            val stack = handler.getFluidInTank(i)
+            if (stack.isEmpty) continue
+            val f = ExplosiveFluids.factor(stack) ?: continue
+            total += stack.amount
+            if (ef == null) ef = f
+        }
+        if (total <= 0 || ef == null) return null
+        return total to ef
+    }
 
     private fun collectTankBlocks(): Set<Block> {
         val result = HashSet<Block>()
