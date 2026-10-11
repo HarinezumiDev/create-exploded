@@ -86,4 +86,4 @@ Custom damage that bypasses vanilla explosions? See [API.md](API.md) — one met
 ## Feedback & Issues
 
 Found a fluid that should (or shouldn't) go boom? Balance feels off? Leave your feedback on my Discord server — this mod is actively tuned based on player feedback.
-[Discord!](https://discord.gg/VhuDn6A7WA)
+[Discord!](https://discord.com/invite/ZvM8trgsM7)
