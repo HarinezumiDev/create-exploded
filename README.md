@@ -25,17 +25,21 @@ No more parking a warehouse of gasoline next to your TNT cannon and walking away
 | Napalm | 1.2 |
 | Diesel | 1.15 |
 | Crude Oil | 1.1 |
+| Ethylene | 1.1 |
+| Gas Oil | 1.1 |
 | LPG / Propane / Butane | 1.1 |
-| Naphtha | 1.05 |
+| Oil / Desalted Oil | 1.1 |
+| Naphtha / Naphta | 1.05 |
 | Gasoline | 1.0 |
 | Kerosene | 1.0 |
 | Heavy Oil | 1.0 |
+| Fuel Oil | 1.0 |
+| Volatile Gas | 1.0 |
 | Other fuel (`c:fuel`, `tfmg:flammable`, `tfmg:fuel`) | 1.0 |
 | Biodiesel | 0.9 |
+| Hydrogen Sulfide | 0.9 |
 | Ethanol | 0.75 |
-| Creosote | 0.7 |
 | Plant Oil | 0.6 |
-| Lubrication Oil | 0.6 |
 | Furnace Gas | 0.5 |
 
 | Source | Container(s) | Status |
@@ -44,6 +48,7 @@ No more parking a warehouse of gasoline next to your TNT cannon and walking away
 | **[Kotlin for Forge](https://modrinth.com/mod/kotlin-for-forge)** | — | Required |
 | **[Create: Diesel Generators](https://modrinth.com/mod/create-diesel-generators)** | Fluid Tank / Fluid Vessel | Tested |
 | **[Create: The Factory Must Grow](https://modrinth.com/mod/create-tfmg)** | Fluid Tank | Tested |
+| **[Create: Petrochem](https://www.curseforge.com/minecraft/mc-mods/create-petrochem)** | Fluid Tank | Tested |
 | **[Create: Connected](https://modrinth.com/mod/create-connected)** | Fluid Vessel | Tested |
 | **[Create Propulsion: Simulated](https://modrinth.com/mod/create-propulsion-simulated)** | Thruster, Liquid Vector Thruster | Tested |
 
